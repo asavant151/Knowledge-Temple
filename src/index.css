@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+/* Add to your global CSS */
+.swiper-progress-bar {
+  width: 0%;
+}
+
+.swiper-progress-bar.active {
+  width: 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+.swiper-button-prev:after, .swiper-button-next:after {
+  font-size: 20px !important;
+}
+
+.swiper-button-prev.hover\:after\:opacity-100:hover::after {
+  content: 'prev' !important;
+}
+
+.swiper-button-next.hover\:after\:opacity-100:hover::after {
+  content: 'next' !important;
+}
