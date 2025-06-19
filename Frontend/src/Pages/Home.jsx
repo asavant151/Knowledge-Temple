@@ -114,7 +114,8 @@ const Home = () => {
       description: "Master modern JavaScript frameworks and build interactive web applications.",
       image: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
       price: "$99",
-      discount: "$79"
+      discount: "$79",
+      isAvailable: true
     },
     {
       id: 2,
@@ -122,7 +123,8 @@ const Home = () => {
       description: "Learn data analysis, visualization, and machine learning basics.",
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
       price: "$129",
-      discount: "$99"
+      discount: "$99",
+      isAvailable: true
     },
     {
       id: 3,
@@ -130,7 +132,8 @@ const Home = () => {
       description: "Create stunning user interfaces and enhance user experience.",
       image: "https://images.unsplash.com/photo-1541462608143-67571c6738dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
       price: "$149",
-      discount: "$119"
+      discount: "$119",
+      isAvailable: false
     }
   ];
 
@@ -360,8 +363,10 @@ const Home = () => {
                   <p className="text-gray-600 mb-4">{course.description}</p>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400 line-through">{course.price}</span>
-                    <button onClick={() => navigate('/coming-soon')} className="flex items-center text-blue-600 font-semibold hover:text-blue-800 transition-colors">
-                      View Course <ArrowRight className="ml-2 w-4 h-4" />
+                    <button onClick={() => course.isAvailable 
+                        ? navigate(`/course-detail/${course.id}`) 
+                        : navigate('/coming-soon')} className="flex items-center text-blue-600 font-semibold hover:text-blue-800 transition-colors">
+                      {course.isAvailable ? 'View Course' : 'Coming Soon'} <ArrowRight className="ml-2 w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -369,7 +374,7 @@ const Home = () => {
             ))}
           </div>
           <div className="text-center mt-12">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-300">
+            <button onClick={() => navigate('/courses')} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-300">
               View All Courses
             </button>
           </div>

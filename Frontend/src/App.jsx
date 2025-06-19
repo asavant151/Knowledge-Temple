@@ -11,6 +11,12 @@ import ForgotPassword from "./Pages/ForgotPassword";
 import OtpVerification from "./Pages/OtpVerification";
 import ResetPassword from "./Pages/ResetPassword";
 import ComingSoon from "./component/ComingSoon";
+import AccountPage from "./Pages/AccountPage";
+import CourseDetail from "./Pages/CourseDetail";
+import FacultyPage from "./Pages/FacultyPage";
+import CoursePage from "./Pages/CoursePage";
+import Tutoring from "./Pages/Tutoring";
+import WorkshopsPage from "./Pages/WorkshopsPage";
 
 const App = () => {
   return (
@@ -27,6 +33,12 @@ const App = () => {
           <Route path="/otp-verification" element={<OtpVerification />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/coming-soon" element={<ComingSoon />} />
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/course-detail/:id" element={<CourseDetail />} />
+          <Route path="/faculty" element={<FacultyPage />} />
+          <Route path="/courses" element={<CoursePage />} />
+          <Route path="/services/tutoring" element={<Tutoring />} />
+          <Route path="/services/workshops" element={<WorkshopsPage />} />
         </Route>
       </Routes>
     </Router>
