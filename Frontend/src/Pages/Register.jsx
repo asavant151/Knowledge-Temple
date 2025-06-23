@@ -29,7 +29,7 @@ const Register = () => {
     confirmPassword: Yup.string()
       .required('Please confirm your password')
       .oneOf([Yup.ref('password'), null], 'Passwords must match'),
-    terms: Yup.boolean()
+    termsAccepted: Yup.boolean()
       .required('You must accept the terms and conditions')
       .oneOf([true], 'You must accept the terms and conditions')
   });

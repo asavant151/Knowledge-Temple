@@ -39,16 +39,22 @@ const Login = () => {
           password: values.password
         });
 
+        const { token, name, email } = response.data;
+
+        console.log(token, name, email);
+
         // Handle successful login
         toast.success('Login successful!');
         
         // Store token and user data based on remember me choice
         if (values.remember) {
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
+          localStorage.setItem('token', token);
+          localStorage.setItem('userName', name);
+          localStorage.setItem('userEmail', email);
         } else {
-          sessionStorage.setItem('token', response.data.token);
-          sessionStorage.setItem('user', JSON.stringify(response.data.user));
+          localStorage.setItem('token', token);
+          localStorage.setItem('userName', name);
+          localStorage.setItem('userEmail', email);
         }
 
         // Redirect to dashboard or home page

@@ -1,52 +1,67 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-
+const crypto = require('crypto');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Please enter your name'],
-    maxlength: [50, 'Name cannot exceed 50 characters'],
-    minlength: [3, 'Name must be at least 3 characters']
+    required: [true, 'Please provide a name'],
+    trim: true,
+    maxlength: [50, 'Name cannot be more than 50 characters'],
   },
   email: {
     type: String,
-    required: [true, 'Please enter your email'],
+    required: [true, 'Please provide an email'],
     unique: true,
-    validate: [validator.isEmail, 'Please enter a valid email']
+    lowercase: true,
+    validate: [validator.isEmail, 'Please provide a valid email'],
   },
   password: {
     type: String,
-    required: [true, 'Please enter your password'],
-    minlength: [8, 'Password must be at least 8 characters'],
-    select: false
+    required: [true, 'Please provide a password'],
+    minlength: [6, 'Password must be at least 6 characters'],
+    select: false,
   },
   confirmPassword: {
     type: String,
+    select: false,
     required: [true, 'Please confirm your password'],
-    message: 'Passwords do not match',
-    select: false
+    validate: {
+      validator: function (el) {
+        return el === this.password;
+      },
+      message: 'Passwords do not match',
+    },
   },
-  terms: {
+  termsAccepted: {
     type: Boolean,
-    required: [true, 'Please accept the terms and conditions'],
-    message: 'You must accept the terms and conditions',
-    select: false
+    required: [true, 'You must accept the terms and conditions'],
+    default: false,
   },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
-
 // Hash password before saving
-userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) {
-      next();
-    }
-  
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-  });
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+// Method to compare passwords
+userSchema.methods.correctPassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
-module.exports = mongoose.model('User', userSchema);
+userSchema.methods.createPasswordResetToken = async function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  return resetToken;
+};
+const User = mongoose.model('User', userSchema);
+module.exports = User;
