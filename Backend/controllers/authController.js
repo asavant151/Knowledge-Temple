@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const Otp = require("../models/Otp");
 const generateToken = require("../config/jwt");
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const asyncHandler = require("express-async-handler");
 const validator = require("validator");
 const sendEmail = require("../config/email");
@@ -148,47 +150,92 @@ const verifyOtp = asyncHandler(async (req, res) => {
     status: "success",
     message: "OTP verifed successfully",
     resetToken,
+    email,
   });
 });
 // @desc    Reset Password
-// @route   PATCH /api/auth/reset-password/:token
+// @route   POST /api/auth/reset-password
+// @access  Public
+// @desc    Reset Password
+// @route   POST /api/auth/reset-password
 // @access  Public
 const resetPassword = asyncHandler(async (req, res) => {
-  const { token } = req.params;
-  const { password, confrmPassword } = req.body;
-  // 1) Get user based on the token
-  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-  const user = await User.findOne({
-    passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() },
-  });
-  // 2) If token has not expired, and there is user, set the new password
-  if (!user) {
-    res.status(400);
-    throw new Error("Token is invalid or has expired");
+  const { token, email, password, confirmPassword } = req.body;
+
+  if (!token || !email || !password || !confirmPassword) {
+    return res.status(400).json({ message: "Please provide all required fields" });
   }
-  if (password !== confrmPassword) {
-    res.status(400);
-    throw new Error("Passwords do not match");
+
+  if (password !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match" });
   }
-  // 3) Update password and clear reset token felds
-  user.password = password;
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
-  await user.save();
-  // 4) Log the user in, send JWT
-  const authToken = generateToken(user._id);
-  res.status(200).json({
-    status: "success",
-    token: authToken,
-    data: {
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-      },
-    },
-  });
+
+  try {
+    // 1) Hash the token exactly like we did when creating it
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
+
+    // 2) Find user by email AND hashed token
+    const user = await User.findOne({
+      email,
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() } // Check if token is not expired
+    });
+
+    if (!user) {
+      // More detailed error message
+      const potentialUser = await User.findOne({ email });
+      if (!potentialUser) {
+        return res.status(400).json({ message: "User not found" });
+      }
+      
+      const tokenValid = potentialUser.passwordResetToken === hashedToken;
+      const tokenExpired = potentialUser.passwordResetExpires <= Date.now();
+      
+      if (!tokenValid) {
+        return res.status(400).json({ message: "Invalid reset token" });
+      }
+      if (tokenExpired) {
+        return res.status(400).json({ message: "Reset token has expired" });
+      }
+      
+      return res.status(400).json({ message: "Invalid token or token expired" });
+    }
+
+    // 3) Check if new password is different from current password
+    const isSamePassword = await bcrypt.compare(password, user.password || '');
+    if (isSamePassword) {
+      return res.status(400).json({ 
+        message: "New password cannot be the same as old password" 
+      });
+    }
+
+    // 4) Update password and clear reset token fields
+    user.password = password;
+    user.confirmPassword = confirmPassword;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    
+    await user.save();
+
+    // 5) Send confirmation email
+    const message = `Your password has been successfully changed.`;
+    await sendEmail({
+      email: user.email,
+      subject: "Password changed successfully",
+      message,
+    });
+
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.error('Password reset error:', error);
+    res.status(500).json({ 
+      message: "Error resetting password",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
 });
 module.exports = {
   registerUser,

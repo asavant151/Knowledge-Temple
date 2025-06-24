@@ -38,17 +38,17 @@ const Register = () => {
     try {
       // Remove confirmPassword from the payload as backend doesn't need it
       const { ...userData } = values;
+      console.log(userData);
       
       const response = await API.post('/auth/register', userData);
+      console.log(response);
+      
       
       // Handle successful registration
-      toast.success('Registration successful! Redirecting...');
+      toast.success(response.data.message || 'Registration successful! Redirecting...');
       
-      // Store token in localStorage (or context/state as per your auth flow)
-      localStorage.setItem('token', response.data.token);
-      
-      // Redirect to dashboard or home page
-      navigate('/');
+      // Redirect to login page
+      navigate('/login');
       
     } catch (error) {
       // Handle errors from the API
@@ -100,7 +100,7 @@ const Register = () => {
               email: '',
               password: '',
               confirmPassword: '',
-              terms: false
+              termsAccepted: false
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
@@ -201,17 +201,17 @@ const Register = () => {
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
                     <Field
-                      id="terms"
-                      name="terms"
+                      id="termsAccepted"
+                      name="termsAccepted"
                       type="checkbox"
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="terms" className="font-medium text-gray-700">
+                    <label htmlFor="termsAccepted" className="font-medium text-gray-700">
                       I agree to the <a href="#" className="text-blue-600 hover:text-blue-500">Terms of Service</a> and <a href="#" className="text-blue-600 hover:text-blue-500">Privacy Policy</a>
                     </label>
-                    <ErrorMessage name="terms" component="div" className="mt-1 text-sm text-red-600" />
+                    <ErrorMessage name="termsAccepted" component="div" className="mt-1 text-sm text-red-600" />
                   </div>
                 </div>
 

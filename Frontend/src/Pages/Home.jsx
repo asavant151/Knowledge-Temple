@@ -1,34 +1,176 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, Navigation } from 'swiper/modules';
-import { 
-  BookOpen, 
-  GraduationCap, 
-  Users, 
-  Globe, 
-  Award, 
-  Clock, 
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import {
+  BookOpen,
+  GraduationCap,
+  Users,
+  Globe,
+  Award,
+  Clock,
   ChevronDown,
   ChevronUp,
   Star,
-  ArrowRight
-} from 'lucide-react';
+  ArrowRight,
+  X,
+} from "lucide-react";
 
 // Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
 
 const Home = () => {
   // FAQ Accordion State
   const [activeIndex, setActiveIndex] = useState(null);
+  const [showQuizModal, setShowQuizModal] = useState(false);
 
   const toggleAccordion = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Show quiz modal when redirected to home page
+  useEffect(() => {
+    if (location.state?.showQuizModal) {
+      setShowQuizModal(true);
+    }
+  }, [location.state]);
+
+  // Quiz Modal Component
+  const QuizModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl max-w-fit w-full p-8 relative">
+        <button
+          onClick={() => setShowQuizModal(false)}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="w-full md:w-1/2">
+            <img
+              src="../assets/images/Quiz.png"
+              alt="quiz"
+              className="max-w-full w-full max-h-96 h-auto object-contain"
+            />
+          </div>
+          <div className="w-full md:w-1/2">
+            <div className="md:text-start text-center mb-6">
+              <h3 className="text-2xl font-bold text-blue-800 mb-2">
+                Join the
+              </h3>
+              <h2 className="text-3xl font-bold mb-4 text-blue-800">
+                Ultimate Quiz Challenge!
+              </h2>
+              <p className="text-gray-600">
+                Treat your knowledge and compete for amazing prizes! Whether
+                you're a quiz master or just love learning new things, this
+                competition is for you!
+              </p>
+            </div>
+
+            <div className="space-y-4 mb-8">
+              <div className="flex md:items-start items-center">
+                <div className="bg-blue-100 p-1 rounded-full mr-3 mt-1">
+                  <svg
+                    className="w-4 h-4 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    ></path>
+                  </svg>
+                </div>
+                <p className="text-gray-700">
+                  Exciting questions on various topics!
+                </p>
+              </div>
+              <div className="flex md:items-start items-center">
+                <div className="bg-blue-100 p-1 rounded-full mr-3 mt-1">
+                  <svg
+                    className="w-4 h-4 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    ></path>
+                  </svg>
+                </div>
+                <p className="text-gray-700">
+                  Win gift cards, gadgets, and more
+                </p>
+              </div>
+              <div className="flex md:items-start items-center">
+                <div className="bg-blue-100 p-1 rounded-full mr-3 mt-1">
+                  <svg
+                    className="w-4 h-4 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    ></path>
+                  </svg>
+                </div>
+                <p className="text-gray-700">
+                  Compete with friends and meet new quiz enthusiasts!
+                </p>
+              </div>
+              <div className="flex md:items-start items-center">
+                <div className="bg-blue-100 p-1 rounded-full mr-3 mt-1">
+                  <svg
+                    className="w-4 h-4 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    ></path>
+                  </svg>
+                </div>
+                <p className="text-gray-700">
+                  Easy registration in just a few clicks!
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                navigate("/quiz-registration");
+                setShowQuizModal(false);
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-300"
+            >
+              Register here
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   // Reviews Data
   const reviews = [
@@ -36,50 +178,56 @@ const Home = () => {
       id: 1,
       name: "Sarah Johnson",
       role: "Web Developer",
-      comment: "KnowledgeTemple transformed my career. The courses are comprehensive and taught by industry experts.",
+      comment:
+        "KnowledgeTemple transformed my career. The courses are comprehensive and taught by industry experts.",
       rating: 5,
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
     },
     {
       id: 2,
       name: "Michael Chen",
       role: "Data Scientist",
-      comment: "The hands-on projects helped me build a portfolio that got me hired within 3 months of completing the course.",
+      comment:
+        "The hands-on projects helped me build a portfolio that got me hired within 3 months of completing the course.",
       rating: 4,
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
     },
     {
       id: 3,
       name: "Emma Rodriguez",
       role: "UX Designer",
-      comment: "I appreciated the flexible learning schedule that allowed me to balance work and studies effectively.",
+      comment:
+        "I appreciated the flexible learning schedule that allowed me to balance work and studies effectively.",
       rating: 5,
-      avatar: "https://randomuser.me/api/portraits/women/63.jpg"
+      avatar: "https://randomuser.me/api/portraits/women/63.jpg",
     },
     {
       id: 4,
       name: "Alex Johnson",
       role: "UX Designer",
-      comment: "I appreciated the flexible learning schedule that allowed me to balance work and studies effectively.",
+      comment:
+        "I appreciated the flexible learning schedule that allowed me to balance work and studies effectively.",
       rating: 4,
-      avatar: "https://randomuser.me/api/portraits/women/64.jpg"
+      avatar: "https://randomuser.me/api/portraits/women/64.jpg",
     },
     {
       id: 5,
       name: "Tommy Smith",
       role: "UX Designer",
-      comment: "I appreciated the flexible learning schedule that allowed me to balance work and studies effectively.",
+      comment:
+        "I appreciated the flexible learning schedule that allowed me to balance work and studies effectively.",
       rating: 4,
-      avatar: "https://randomuser.me/api/portraits/women/65.jpg"
+      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
     },
     {
       id: 6,
       name: "John Doe",
       role: "UX Designer",
-      comment: "I appreciated the flexible learning schedule that allowed me to balance work and studies effectively.",
+      comment:
+        "I appreciated the flexible learning schedule that allowed me to balance work and studies effectively.",
       rating: 4,
-      avatar: "https://randomuser.me/api/portraits/women/66.jpg"
-    }
+      avatar: "https://randomuser.me/api/portraits/women/66.jpg",
+    },
   ];
 
   // Services Data
@@ -87,23 +235,25 @@ const Home = () => {
     {
       icon: <BookOpen className="w-10 h-10 text-blue-600" />,
       title: "Comprehensive Courses",
-      description: "200+ courses across various disciplines with regularly updated content."
+      description:
+        "200+ courses across various disciplines with regularly updated content.",
     },
     {
       icon: <GraduationCap className="w-10 h-10 text-blue-600" />,
       title: "Expert Instructors",
-      description: "Learn from industry professionals with real-world experience."
+      description:
+        "Learn from industry professionals with real-world experience.",
     },
     {
       icon: <Globe className="w-10 h-10 text-blue-600" />,
       title: "Global Community",
-      description: "Connect with learners from 100+ countries worldwide."
+      description: "Connect with learners from 100+ countries worldwide.",
     },
     {
       icon: <Award className="w-10 h-10 text-blue-600" />,
       title: "Certification",
-      description: "Earn recognized certificates upon course completion."
-    }
+      description: "Earn recognized certificates upon course completion.",
+    },
   ];
 
   // Courses Data
@@ -111,78 +261,98 @@ const Home = () => {
     {
       id: 1,
       title: "Advanced JavaScript",
-      description: "Master modern JavaScript frameworks and build interactive web applications.",
-      image: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+      description:
+        "Master modern JavaScript frameworks and build interactive web applications.",
+      image:
+        "https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
       price: "$99",
       discount: "$79",
-      isAvailable: true
+      isAvailable: true,
     },
     {
       id: 2,
       title: "Data Science Fundamentals",
-      description: "Learn data analysis, visualization, and machine learning basics.",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      description:
+        "Learn data analysis, visualization, and machine learning basics.",
+      image:
+        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
       price: "$129",
       discount: "$99",
-      isAvailable: true
+      isAvailable: true,
     },
     {
       id: 3,
       title: "UX/UI Design Masterclass",
-      description: "Create stunning user interfaces and enhance user experience.",
-      image: "https://images.unsplash.com/photo-1541462608143-67571c6738dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      description:
+        "Create stunning user interfaces and enhance user experience.",
+      image:
+        "https://images.unsplash.com/photo-1541462608143-67571c6738dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
       price: "$149",
       discount: "$119",
-      isAvailable: false
-    }
+      isAvailable: false,
+    },
   ];
 
   // FAQ Data
   const faqs = [
     {
       question: "How do I enroll in a course?",
-      answer: "Simply browse our course catalog, select your desired course, and click 'Enroll Now'. You'll be guided through the payment process and gain immediate access to the course materials."
+      answer:
+        "Simply browse our course catalog, select your desired course, and click 'Enroll Now'. You'll be guided through the payment process and gain immediate access to the course materials.",
     },
     {
       question: "Can I access courses on mobile devices?",
-      answer: "Yes, our platform is fully responsive and works on all devices including smartphones and tablets. You can even download lessons for offline viewing."
+      answer:
+        "Yes, our platform is fully responsive and works on all devices including smartphones and tablets. You can even download lessons for offline viewing.",
     },
     {
       question: "What if I need help during my course?",
-      answer: "We offer multiple support channels including discussion forums, live Q&A sessions with instructors, and email support for technical issues."
+      answer:
+        "We offer multiple support channels including discussion forums, live Q&A sessions with instructors, and email support for technical issues.",
     },
     {
       question: "Are the certificates recognized by employers?",
-      answer: "Yes, our certificates are widely recognized in the industry. Many of our students have used them to advance their careers or find new jobs."
-    }
+      answer:
+        "Yes, our certificates are widely recognized in the industry. Many of our students have used them to advance their careers or find new jobs.",
+    },
   ];
 
   return (
     <div className="space-y-20">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-20">
+        {/* Quiz Modal */}
+        {showQuizModal && <QuizModal />}
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                Transform Your Future with <span className="text-yellow-300">KnowledgeTemple</span>
+                Transform Your Future with{" "}
+                <span className="text-yellow-300">KnowledgeTemple</span>
               </h1>
               <p className="text-xl mb-8 text-gray-200">
-                Join thousands of learners worldwide gaining in-demand skills from industry experts.
+                Join thousands of learners worldwide gaining in-demand skills
+                from industry experts.
               </p>
               <div className="flex space-x-4">
-                <button className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 md:px-8 px-4 rounded-lg transition duration-300">
+                <button
+                  onClick={() => navigate("/courses")}
+                  className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 md:px-8 px-4 rounded-lg transition duration-300"
+                >
                   Explore Courses
                 </button>
-                <button className="border-2 border-white hover:bg-white hover:text-blue-900 text-white font-bold py-3 md:px-8 px-4 rounded-lg transition duration-300">
+                <button
+                  onClick={() => navigate("/about")}
+                  className="border-2 border-white hover:bg-white hover:text-blue-900 text-white font-bold py-3 md:px-8 px-4 rounded-lg transition duration-300"
+                >
                   Learn More
                 </button>
               </div>
             </div>
             <div className="md:w-1/2">
-              <img 
-                src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-                alt="Students learning" 
+              <img
+                src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                alt="Students learning"
                 className="rounded-xl shadow-2xl"
               />
             </div>
@@ -196,7 +366,10 @@ const Home = () => {
           <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10">
             <h2 className="text-3xl font-bold mb-6">About KnowledgeTemple</h2>
             <p className="text-lg mb-6 text-gray-600">
-              Founded in 2015, KnowledgeTemple has grown to become a leading online learning platform with over 500,000 students worldwide. Our mission is to make quality education accessible to everyone, everywhere.
+              Founded in 2015, KnowledgeTemple has grown to become a leading
+              online learning platform with over 500,000 students worldwide. Our
+              mission is to make quality education accessible to everyone,
+              everywhere.
             </p>
             <div className="space-y-4">
               <div className="flex items-start">
@@ -229,19 +402,19 @@ const Home = () => {
             </div>
           </div>
           <div className="md:w-1/2 grid grid-cols-2 gap-4">
-            <img 
-              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" 
-              alt="Classroom" 
+            <img
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80"
+              alt="Classroom"
               className="rounded-lg shadow-md h-64 w-full object-cover"
             />
-            <img 
-              src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" 
-              alt="Learning" 
+            <img
+              src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80"
+              alt="Learning"
               className="rounded-lg shadow-md h-64 w-full object-cover"
             />
-            <img 
-              src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-              alt="Graduation" 
+            <img
+              src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+              alt="Graduation"
               className="rounded-lg shadow-md h-64 w-full object-cover col-span-2"
             />
           </div>
@@ -252,16 +425,19 @@ const Home = () => {
       <section className="bg-gray-50 py-16">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Why Choose KnowledgeTemple?</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Why Choose KnowledgeTemple?
+            </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We provide the best learning experience with cutting-edge technology and proven teaching methods.
+              We provide the best learning experience with cutting-edge
+              technology and proven teaching methods.
             </p>
           </div>
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
-              <img 
-                src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-                alt="Features" 
+              <img
+                src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                alt="Features"
                 className="rounded-xl shadow-lg"
               />
             </div>
@@ -274,9 +450,12 @@ const Home = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Flexible Learning</h3>
+                    <h3 className="text-xl font-semibold mb-2">
+                      Flexible Learning
+                    </h3>
                     <p className="text-gray-600">
-                      Learn at your own pace with 24/7 access to course materials and lifetime access to purchased courses.
+                      Learn at your own pace with 24/7 access to course
+                      materials and lifetime access to purchased courses.
                     </p>
                   </div>
                 </div>
@@ -287,9 +466,12 @@ const Home = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Expert Instructors</h3>
+                    <h3 className="text-xl font-semibold mb-2">
+                      Expert Instructors
+                    </h3>
                     <p className="text-gray-600">
-                      Learn from industry professionals who bring real-world experience to their teaching.
+                      Learn from industry professionals who bring real-world
+                      experience to their teaching.
                     </p>
                   </div>
                 </div>
@@ -300,9 +482,12 @@ const Home = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Global Community</h3>
+                    <h3 className="text-xl font-semibold mb-2">
+                      Global Community
+                    </h3>
                     <p className="text-gray-600">
-                      Join a network of learners from around the world and collaborate on projects.
+                      Join a network of learners from around the world and
+                      collaborate on projects.
                     </p>
                   </div>
                 </div>
@@ -322,8 +507,8 @@ const Home = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services.map((service, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 hover:border-blue-200"
             >
               <div className="bg-blue-50 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6">
@@ -347,11 +532,14 @@ const Home = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courses.map((course) => (
-              <div key={course.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <div
+                key={course.id}
+                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              >
                 <div className="relative">
-                  <img 
-                    src={course.image} 
-                    alt={course.title} 
+                  <img
+                    src={course.image}
+                    alt={course.title}
                     className="w-full h-48 object-cover"
                   />
                   <div className="absolute top-4 right-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
@@ -362,11 +550,19 @@ const Home = () => {
                   <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
                   <p className="text-gray-600 mb-4">{course.description}</p>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400 line-through">{course.price}</span>
-                    <button onClick={() => course.isAvailable 
-                        ? navigate(`/course-detail/${course.id}`) 
-                        : navigate('/coming-soon')} className="flex items-center text-blue-600 font-semibold hover:text-blue-800 transition-colors">
-                      {course.isAvailable ? 'View Course' : 'Coming Soon'} <ArrowRight className="ml-2 w-4 h-4" />
+                    <span className="text-gray-400 line-through">
+                      {course.price}
+                    </span>
+                    <button
+                      onClick={() =>
+                        course.isAvailable
+                          ? navigate(`/course-detail/${course.id}`)
+                          : navigate("/coming-soon")
+                      }
+                      className="flex items-center text-blue-600 font-semibold hover:text-blue-800 transition-colors"
+                    >
+                      {course.isAvailable ? "View Course" : "Coming Soon"}{" "}
+                      <ArrowRight className="ml-2 w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -374,7 +570,10 @@ const Home = () => {
             ))}
           </div>
           <div className="text-center mt-12">
-            <button onClick={() => navigate('/courses')} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-300">
+            <button
+              onClick={() => navigate("/courses")}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-300"
+            >
               View All Courses
             </button>
           </div>
@@ -384,14 +583,19 @@ const Home = () => {
       {/* FAQ Section */}
       <section className="container mx-auto px-6 py-16">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+          <h2 className="text-3xl font-bold mb-4">
+            Frequently Asked Questions
+          </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Find answers to common questions about our platform
           </p>
         </div>
         <div className="max-w-3xl mx-auto">
           {faqs.map((faq, index) => (
-            <div key={index} className="mb-4 border-b border-gray-200 last:border-0">
+            <div
+              key={index}
+              className="mb-4 border-b border-gray-200 last:border-0"
+            >
               <button
                 className="flex justify-between items-center w-full py-5 text-left font-semibold text-lg hover:text-blue-600 transition-colors"
                 onClick={() => toggleAccordion(index)}
@@ -404,7 +608,9 @@ const Home = () => {
                 )}
               </button>
               <div
-                className={`overflow-hidden transition-all duration-300 ${activeIndex === index ? 'max-h-96 pb-5' : 'max-h-0'}`}
+                className={`overflow-hidden transition-all duration-300 ${
+                  activeIndex === index ? "max-h-96 pb-5" : "max-h-0"
+                }`}
               >
                 <p className="text-gray-600">{faq.answer}</p>
               </div>
@@ -452,9 +658,9 @@ const Home = () => {
               <SwiperSlide key={review.id}>
                 <div className="bg-white p-8 rounded-xl shadow-md h-full">
                   <div className="flex items-center mb-4">
-                    <img 
-                      src={review.avatar} 
-                      alt={review.name} 
+                    <img
+                      src={review.avatar}
+                      alt={review.name}
                       className="w-12 h-12 rounded-full object-cover mr-4"
                     />
                     <div>
@@ -464,9 +670,13 @@ const Home = () => {
                   </div>
                   <div className="flex mb-4">
                     {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                      <Star
+                        key={i}
+                        className={`w-5 h-5 ${
+                          i < review.rating
+                            ? "text-yellow-400 fill-yellow-400"
+                            : "text-gray-300"
+                        }`}
                       />
                     ))}
                   </div>
@@ -483,9 +693,13 @@ const Home = () => {
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Start Learning?</h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
-            Join thousands of students advancing their careers with KnowledgeTemple
+            Join thousands of students advancing their careers with
+            KnowledgeTemple
           </p>
-          <button className="bg-white text-blue-600 hover:bg-gray-100 font-bold py-3 px-8 rounded-lg transition duration-300">
+          <button
+            onClick={() => navigate("/signup")}
+            className="bg-white text-blue-600 hover:bg-gray-100 font-bold py-3 px-8 rounded-lg transition duration-300"
+          >
             Enroll Now
           </button>
         </div>

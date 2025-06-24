@@ -41,8 +41,6 @@ const Login = () => {
 
         const { token, name, email } = response.data;
 
-        console.log(token, name, email);
-
         // Handle successful login
         toast.success('Login successful!');
         

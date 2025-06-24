@@ -1,18 +1,64 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Lock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const OtpVerification = () => {
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [isVerified, setIsVerified] = useState(false);
+  const navigate = useNavigate();
+  const [isVerified, setIsVerified] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [error, setError] = React.useState('');
+
+  // Assuming we have the email from location state or props
+  // For this example, I'll use the email from your API body
+  const email = localStorage.getItem('email');
+
+  const formik = useFormik({
+    initialValues: {
+      otp: ['', '', '', '', '', '']
+    },
+    validationSchema: Yup.object({
+      otp: Yup.array()
+        .of(Yup.string().required('Digit is required').matches(/^[0-9]$/, 'Must be a digit'))
+        .length(6, 'OTP must be 6 digits')
+    }),
+    onSubmit: async (values) => {
+      setIsSubmitting(true);
+      setError('');
+      
+      try {
+        const otpCode = values.otp.join('');
+        
+        const response = await axios.post('http://localhost:5000/api/auth/verify-otp', {
+          email: email,
+          otp: parseInt(otpCode, 10)
+        });
+
+        if (response.data) {
+          localStorage.setItem('resetToken', response.data.resetToken);
+          setIsVerified(true);
+          toast.success('OTP resent successfully!');
+          navigate('/reset-password');
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || 'An error occurred during verification');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  });
 
   const handleChange = (e, index) => {
     const value = e.target.value;
     if (isNaN(value)) return;
 
-    const newOtp = [...otp];
+    const newOtp = [...formik.values.otp];
     newOtp[index] = value.substring(value.length - 1);
-    setOtp(newOtp);
+    formik.setFieldValue('otp', newOtp);
 
     // Auto focus next input
     if (value && index < 5) {
@@ -20,11 +66,16 @@ const OtpVerification = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Verify OTP logic here
-    console.log(otp.join(''));
-    setIsVerified(true);
+  const handleResendOtp = async () => {
+    try {
+      await axios.post('http://localhost:5000/api/auth/resend-otp', {
+        email: email
+      });
+      toast.success('OTP resent successfully!');
+      navigate('/reset-password');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to resend OTP');
+    }
   };
 
   return (
@@ -46,35 +97,57 @@ const OtpVerification = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-md">
+              {error}
+            </div>
+          )}
+
           {!isVerified ? (
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-6" onSubmit={formik.handleSubmit}>
               <div>
                 <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-2">
                   6-digit OTP Code
                 </label>
                 <div className="flex justify-between space-x-2">
-                  {otp.map((data, index) => (
+                  {formik.values.otp.map((data, index) => (
                     <input
                       key={index}
                       id={`otp-${index}`}
+                      name={`otp[${index}]`}
                       type="text"
                       maxLength="1"
                       value={data}
                       onChange={(e) => handleChange(e, index)}
-                      className="w-full h-14 text-center text-2xl border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      onBlur={formik.handleBlur}
+                      className={`w-full h-14 text-center text-2xl border ${
+                        formik.errors.otp?.[index] && formik.touched.otp?.[index]
+                          ? 'border-red-500'
+                          : 'border-gray-300'
+                      } rounded-md focus:ring-blue-500 focus:border-blue-500`}
                       autoFocus={index === 0}
                     />
                   ))}
                 </div>
+                {formik.errors.otp && formik.touched.otp && (
+                  <div className="mt-1 text-sm text-red-600">
+                    {typeof formik.errors.otp === 'string' 
+                      ? formik.errors.otp 
+                      : 'Please enter all 6 digits'}
+                  </div>
+                )}
               </div>
 
               <div>
                 <button
                   type="submit"
-                  className="group w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+                  disabled={isSubmitting}
+                  className="group w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 disabled:opacity-50"
                 >
-                  Verify OTP
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  {isSubmitting ? 'Verifying...' : 'Verify OTP'}
+                  {!isSubmitting && (
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  )}
                 </button>
               </div>
             </form>
@@ -99,7 +172,12 @@ const OtpVerification = () => {
           )}
 
           <div className="mt-6 text-center">
-            <button className="font-medium text-blue-600 hover:text-blue-500 text-sm">
+            <button 
+              type="button"
+              onClick={handleResendOtp}
+              className="font-medium text-blue-600 hover:text-blue-500 text-sm"
+              disabled={isVerified}
+            >
               Resend OTP
             </button>
           </div>

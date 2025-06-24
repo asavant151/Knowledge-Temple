@@ -1,17 +1,55 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Mail, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const [error, setError] = React.useState(null);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle forgot password logic here
-    console.log({ email });
-    setIsSubmitted(true);
-  };
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+    },
+    validationSchema: Yup.object({
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Email is required'),
+    }),
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        setError(null);
+        const response = await axios.post(
+          'http://localhost:5000/api/auth/forgot-password',
+          {
+            email: values.email,
+          }
+        );
+        
+        if (response.data) {
+          setIsSubmitted(true);
+          localStorage.setItem('email', values.email);
+          toast.success(response.data.message || 'Password reset link sent successfully!');
+          navigate('/otp-verification');
+          
+        }
+      } catch (err) {
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            'Failed to send reset link'
+        );
+        toast.success(err.response?.data?.message || 'Failed to send reset link');
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -33,7 +71,7 @@ const ForgotPassword = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10">
           {!isSubmitted ? (
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-6" onSubmit={formik.handleSubmit}>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email address
@@ -47,22 +85,46 @@ const ForgotPassword = () => {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    required
-                    className="py-3 pl-10 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className={`py-3 pl-10 block w-full border ${
+                      formik.touched.email && formik.errors.email
+                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                    } rounded-md`}
                     placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                   />
                 </div>
+                {formik.touched.email && formik.errors.email ? (
+                  <p className="mt-2 text-sm text-red-600">{formik.errors.email}</p>
+                ) : null}
               </div>
+
+              {error && (
+                <div className="rounded-md bg-red-50 p-4">
+                  <div className="flex">
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <button
                   type="submit"
-                  className="group w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+                  disabled={formik.isSubmitting}
+                  className="group w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  Send Reset Link
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  {formik.isSubmitting ? (
+                    'Sending...'
+                  ) : (
+                    <>
+                      Send Reset Link
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -73,7 +135,7 @@ const ForgotPassword = () => {
               </div>
               <h3 className="mt-3 text-lg font-medium text-gray-900">Check your email</h3>
               <div className="mt-2 text-sm text-gray-600">
-                <p>We've sent a password reset link to {email}</p>
+                <p>We've sent a password reset link to {formik.values.email}</p>
               </div>
               <div className="mt-6">
                 <Link

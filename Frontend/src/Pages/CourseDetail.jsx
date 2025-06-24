@@ -1,7 +1,9 @@
 import React from 'react';
 import { BookOpen, Clock, Users, Award, Star, ChevronRight, Check, Play, Download } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const CourseDetail = () => {
+  const navigate = useNavigate();
   // Course data
   const course = {
     title: "Advanced JavaScript Masterclass",
@@ -232,11 +234,11 @@ const CourseDetail = () => {
                     </span>
                   </div>
                   
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg mb-4 transition duration-300">
+                  <button onClick={() => navigate('/checkout')} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg mb-4 transition duration-300">
                     Enroll Now
                   </button>
                   
-                  <button className="w-full border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-3 px-4 rounded-lg mb-6 transition duration-300">
+                  <button onClick={() => navigate('/wishlist')} className="w-full border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-3 px-4 rounded-lg mb-6 transition duration-300">
                     Add to Wishlist
                   </button>
                   

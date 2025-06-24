@@ -38,6 +38,8 @@ const userSchema = new mongoose.Schema({
     required: [true, 'You must accept the terms and conditions'],
     default: false,
   },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
   createdAt: {
     type: Date,
     default: Date.now,

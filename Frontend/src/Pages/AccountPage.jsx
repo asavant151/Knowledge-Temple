@@ -11,7 +11,8 @@ import {
   Eye,
   EyeOff,
   Check,
-  X
+  X,
+  Heart
 } from 'lucide-react';
 
 const AccountPage = () => {
@@ -69,11 +70,11 @@ const AccountPage = () => {
                   <ChevronRight className="w-5 h-5 ml-auto" />
                 </button>
                 <button
-                  onClick={() => setActiveTab('billing')}
-                  className={`flex items-center w-full p-3 rounded-lg transition-colors ${activeTab === 'billing' ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'}`}
+                  onClick={() => setActiveTab('wishlist')}
+                  className={`flex items-center w-full p-3 rounded-lg transition-colors ${activeTab === 'wishlist' ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'}`}
                 >
-                  <CreditCard className="w-5 h-5 mr-3" />
-                  <span>Billing</span>
+                  <Heart className="w-5 h-5 mr-3" />
+                  <span>Wishlist</span>
                   <ChevronRight className="w-5 h-5 ml-auto" />
                 </button>
                 <button
@@ -315,6 +316,30 @@ const AccountPage = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'wishlist' && (
+              <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                <div className="p-6 border-b">
+                  <h2 className="text-xl font-semibold">Wishlist</h2>
+                  <p className="text-gray-500">Manage your wishlist</p>
+                </div>
+                <div className="p-6">
+                  <form className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium">Wishlist</h3>
+                        <p className="text-sm text-gray-500">Manage your wishlist</p>
+                      </div>
+                      <div>
+                        <button className="text-blue-600 hover:text-blue-800 font-medium">
+                          Continue Learning
+                        </button>
+                      </div>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}
