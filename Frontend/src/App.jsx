@@ -35,6 +35,7 @@ import Dashboard from "./AdminPanel/Dashboard";
 import Users from "./AdminPanel/Users";
 import Courses from "./AdminPanel/Courses";
 import Settings from "./AdminPanel/Settings";
+import AddCourse from "./AdminPanel/AddCourse";
 
 // Authentication check functions
 const isAuthenticated = () => {
@@ -136,6 +137,7 @@ const App = () => {
           <Route path="users" element={<Users />} />
           <Route path="courses" element={<Courses />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="add-course" element={<AddCourse />} />
         </Route>
 
         {/* 404 Route */}

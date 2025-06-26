@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { 
@@ -9,7 +9,13 @@ import {
   Mail, 
   Linkedin, 
   Twitter,
-  ChevronRight
+  ChevronRight,
+  X,
+  Clock,
+  User,
+  Bookmark,
+  MessageSquare,
+  Star,
 } from 'lucide-react';
 
 // Import Swiper styles
@@ -18,6 +24,8 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 const FacultyPage = () => {
+  const [selectedFaculty, setSelectedFaculty] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // Faculty data
   const facultyMembers = [
     {
@@ -85,6 +93,18 @@ const FacultyPage = () => {
     { value: "200+", label: "Courses Offered", icon: <BookOpen className="w-8 h-8" /> },
     { value: "100+", label: "Countries Represented", icon: <Globe className="w-8 h-8" /> }
   ];
+
+
+  const openFacultyModal = (faculty) => {
+    setSelectedFaculty(faculty);
+    setIsModalOpen(true);
+    document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+  };
+
+  const closeFacultyModal = () => {
+    setIsModalOpen(false);
+    document.body.style.overflow = 'auto'; // Re-enable scrolling
+  };
 
   return (
     <div className="bg-white">
@@ -250,7 +270,7 @@ const FacultyPage = () => {
                       </div>
                     </div>
 
-                    <button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    <button onClick={() => openFacultyModal(faculty)} className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
                       View Profile
                     </button>
                   </div>
@@ -260,6 +280,182 @@ const FacultyPage = () => {
           </Swiper>
         </div>
       </section>
+
+      {/* Faculty Profile Modal */}
+      {isModalOpen && selectedFaculty && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+            onClick={closeFacultyModal}
+          ></div>
+          
+          {/* Modal Container */}
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+              {/* Modal Content */}
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  {/* Close Button */}
+                  <button
+                    type="button"
+                    className="absolute top-4 right-4 bg-gray-100 rounded-full p-2 hover:bg-gray-200 transition-colors"
+                    onClick={closeFacultyModal}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                  
+                  {/* Faculty Image */}
+                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-32 w-32 rounded-full bg-gray-100 sm:mx-0 sm:h-40 sm:w-40 overflow-hidden">
+                    <img
+                      src={selectedFaculty.image}
+                      alt={selectedFaculty.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  
+                  {/* Faculty Info */}
+                  <div className="mt-4 sm:mt-0 sm:ml-6 text-center sm:text-left">
+                    <h3 className="text-2xl leading-6 font-bold text-gray-900">
+                      {selectedFaculty.name}
+                    </h3>
+                    <p className="text-blue-600 font-medium">
+                      {selectedFaculty.role}
+                    </p>
+                    <div className="mt-2 flex justify-center sm:justify-start space-x-4">
+                      <a 
+                        href={`mailto:${selectedFaculty.social.email}`}
+                        className="text-gray-500 hover:text-blue-600 transition-colors"
+                        title="Email"
+                      >
+                        <Mail className="w-5 h-5" />
+                      </a>
+                      <a 
+                        href={`https://${selectedFaculty.social.linkedin}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-blue-700 transition-colors"
+                        title="LinkedIn"
+                      >
+                        <Linkedin className="w-5 h-5" />
+                      </a>
+                      <a 
+                        href={`https://twitter.com/${selectedFaculty.social.twitter}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-blue-400 transition-colors"
+                        title="Twitter"
+                      >
+                        <Twitter className="w-5 h-5" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Detailed Information */}
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+                  {/* Bio Section */}
+                  <div className="md:col-span-2">
+                    <div className="bg-gray-50 p-6 rounded-lg">
+                      <h4 className="text-lg font-semibold mb-4 flex items-center">
+                        <User className="w-5 h-5 mr-2 text-blue-600" />
+                        About
+                      </h4>
+                      <p className="text-gray-600">
+                        {selectedFaculty.bio}
+                      </p>
+                    </div>
+                    
+                    {/* Courses Section */}
+                    <div className="mt-6 bg-gray-50 p-6 rounded-lg">
+                      <h4 className="text-lg font-semibold mb-4 flex items-center">
+                        <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
+                        Courses Taught
+                      </h4>
+                      <ul className="space-y-2">
+                        {selectedFaculty.courses.map((course, index) => (
+                          <li key={index} className="flex items-start">
+                            <ChevronRight className="flex-shrink-0 w-4 h-4 text-blue-500 mt-1 mr-2" />
+                            <span className="text-gray-600">{course}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  {/* Expertise & Stats */}
+                  <div>
+                    <div className="bg-gray-50 p-6 rounded-lg">
+                      <h4 className="text-lg font-semibold mb-4 flex items-center">
+                        <Award className="w-5 h-5 mr-2 text-blue-600" />
+                        Expertise
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedFaculty.expertise.map((skill, index) => (
+                          <span 
+                            key={index} 
+                            className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Quick Stats */}
+                    <div className="mt-6 bg-gray-50 p-6 rounded-lg">
+                      <h4 className="text-lg font-semibold mb-4 flex items-center">
+                        <Clock className="w-5 h-5 mr-2 text-blue-600" />
+                        At a Glance
+                      </h4>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm text-gray-500">Years Teaching</p>
+                          <p className="font-medium">10+ years</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Student Rating</p>
+                          <div className="flex items-center">
+                            {[...Array(5)].map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`w-4 h-4 ${i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                              />
+                            ))}
+                            <span className="ml-2 text-sm text-gray-600">4.8/5</span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Students Taught</p>
+                          <p className="font-medium">2,500+</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Modal Footer */}
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-colors"
+                >
+                  <MessageSquare className="w-5 h-5 mr-2" />
+                  Send Message
+                </button>
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors"
+                  onClick={closeFacultyModal}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
