@@ -33,6 +33,15 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords do not match',
     },
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
   termsAccepted: {
     type: Boolean,
     required: [true, 'You must accept the terms and conditions'],
@@ -41,6 +50,10 @@ const userSchema = new mongoose.Schema({
   passwordResetToken: String,
   passwordResetExpires: Date,
   createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
     type: Date,
     default: Date.now,
   },

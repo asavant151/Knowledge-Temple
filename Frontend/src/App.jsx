@@ -39,12 +39,12 @@ import AddCourse from "./AdminPanel/AddCourse";
 
 // Authentication check functions
 const isAuthenticated = () => {
-  return localStorage.getItem("token") !== null;
+  return localStorage.getItem("token") !== null || sessionStorage.getItem("token") !== null;
 };
 
 const isAdmin = () => {
   // You might want to add role checking here
-  return localStorage.getItem("role") === "admin";
+  return sessionStorage.getItem("userRole") === "admin";
 };
 
 // Route protection components
@@ -54,7 +54,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   }
   
   if (adminOnly && !isAdmin()) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin/dashboard" replace />;
   }
   
   return children;

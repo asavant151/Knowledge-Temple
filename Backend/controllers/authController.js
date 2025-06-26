@@ -1,9 +1,10 @@
 const User = require("../models/User");
 const Otp = require("../models/Otp");
-const generateToken = require("../config/jwt");
+const { generateToken } = require("../config/jwt");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const asyncHandler = require("express-async-handler");
+const { StatusCodes } = require('http-status-codes');
 const validator = require("validator");
 const sendEmail = require("../config/email");
 const generateOtp = require("../utils/generateOtp");
@@ -11,33 +12,38 @@ const generateOtp = require("../utils/generateOtp");
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, confirmPassword, termsAccepted } = req.body;
+  const { name, email, password, confirmPassword, termsAccepted, role } = req.body;
   // Validation
-  if (!name || !email || !password || !confirmPassword) {
-    res.status(400);
-    throw new Error("Please fll in all felds");
+  if (!name || !email || !password || !confirmPassword || !role) {
+    res.status(StatusCodes.BAD_REQUEST);
+    throw new Error("Please fill in all fields");
   }
   if (!validator.isEmail(email)) {
-    res.status(400);
+    res.status(StatusCodes.BAD_REQUEST);
     throw new Error("Please enter a valid email");
   }
   if (password.length < 6) {
-    res.status(400);
+    res.status(StatusCodes.BAD_REQUEST);
     throw new Error("Password must be at least 6 characters");
   }
   if (password !== confirmPassword) {
-    res.status(400);
+    res.status(StatusCodes.BAD_REQUEST);
     throw new Error("Passwords do not match");
   }
   if (!termsAccepted) {
-    res.status(400);
+    res.status(StatusCodes.BAD_REQUEST);
     throw new Error("You must accept the terms and conditions");
   }
   // Check if user exists
   const userExists = await User.findOne({ email });
   if (userExists) {
-    res.status(400);
+    res.status(StatusCodes.BAD_REQUEST);
     throw new Error("User already exists");
+  }
+
+  if (role !== "user" && role !== "premium" && role !== "admin" && role !== "superadmin") {
+    res.status(StatusCodes.BAD_REQUEST);
+    throw new Error("Invalid role");
   }
   // Create user
   const user = await User.create({
@@ -46,16 +52,18 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
     confirmPassword,
     termsAccepted,
+    role,
   });
   if (user) {
-    res.status(201).json({
+    res.status(StatusCodes.CREATED).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
       token: generateToken(user._id),
     });
   } else {
-    res.status(400);
+    res.status(StatusCodes.BAD_REQUEST);
     throw new Error("Invalid user data");
   }
 });
@@ -66,25 +74,26 @@ const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // Validate request
   if (!email || !password) {
-    res.status(400);
+    res.status(StatusCodes.BAD_REQUEST);
     throw new Error("Please provide email and password");
   }
   // Check for user
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
-    res.status(401);
+    res.status(StatusCodes.UNAUTHORIZED);
     throw new Error("Invalid credentials");
   }
   // Check if password matches
   const isMatch = await user.correctPassword(password);
   if (!isMatch) {
-    res.status(401);
+    res.status(StatusCodes.UNAUTHORIZED);
     throw new Error("Invalid credentials");
   }
   res.json({
     _id: user._id,
     name: user.name,
     email: user.email,
+    role: user.role,
     token: generateToken(user._id),
   });
 });
@@ -97,7 +106,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   // 1) Check if email exists
   const user = await User.findOne({ email });
   if (!user) {
-    res.status(404);
+    res.status(StatusCodes.NOT_FOUND);
     throw new Error("User not found with this email");
   }
   // 2) Generate OTP
@@ -136,7 +145,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
   // 1) Find the OTP in database
   const otpRecord = await Otp.findOne({ email, otp });
   if (!otpRecord) {
-    res.status(400);
+    res.status(StatusCodes.BAD_REQUEST);
     throw new Error("Invalid OTP or OTP expired");
   }
   // 2) Delete the OTP after verifcation
@@ -163,11 +172,11 @@ const resetPassword = asyncHandler(async (req, res) => {
   const { token, email, password, confirmPassword } = req.body;
 
   if (!token || !email || !password || !confirmPassword) {
-    return res.status(400).json({ message: "Please provide all required fields" });
+    return res.status(StatusCodes.BAD_REQUEST).json({ message: "Please provide all required fields" });
   }
 
   if (password !== confirmPassword) {
-    return res.status(400).json({ message: "Passwords do not match" });
+    return res.status(StatusCodes.BAD_REQUEST).json({ message: "Passwords do not match" });
   }
 
   try {
@@ -188,26 +197,26 @@ const resetPassword = asyncHandler(async (req, res) => {
       // More detailed error message
       const potentialUser = await User.findOne({ email });
       if (!potentialUser) {
-        return res.status(400).json({ message: "User not found" });
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: "User not found" });
       }
       
       const tokenValid = potentialUser.passwordResetToken === hashedToken;
       const tokenExpired = potentialUser.passwordResetExpires <= Date.now();
       
       if (!tokenValid) {
-        return res.status(400).json({ message: "Invalid reset token" });
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid reset token" });
       }
       if (tokenExpired) {
-        return res.status(400).json({ message: "Reset token has expired" });
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: "Reset token has expired" });
       }
       
-      return res.status(400).json({ message: "Invalid token or token expired" });
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid token or token expired" });
     }
 
     // 3) Check if new password is different from current password
     const isSamePassword = await bcrypt.compare(password, user.password || '');
     if (isSamePassword) {
-      return res.status(400).json({ 
+      return res.status(StatusCodes.BAD_REQUEST).json({ 
         message: "New password cannot be the same as old password" 
       });
     }
@@ -228,19 +237,33 @@ const resetPassword = asyncHandler(async (req, res) => {
       message,
     });
 
-    res.status(200).json({ message: "Password reset successfully" });
+    res.status(StatusCodes.OK).json({ message: "Password reset successfully" });
   } catch (error) {
     console.error('Password reset error:', error);
-    res.status(500).json({ 
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
       message: "Error resetting password",
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
+
+// @desc    Get current logged in user
+// @route   GET /api/auth/me
+// @access  Private
+const getMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select('-password');
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    data: user,
+  });
+});
+
 module.exports = {
   registerUser,
   loginUser,
   forgotPassword,
   verifyOtp,
   resetPassword,
+  getMe,
 };
