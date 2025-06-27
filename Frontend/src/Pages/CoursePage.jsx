@@ -308,7 +308,7 @@ const CoursesPage = () => {
 
         {/* Pagination */}
         <div className="flex justify-center">
-          <nav className="flex items-center space-x-2">
+          <nav className="flex flex-wrap items-center space-x-2">
             <button className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100">
               Previous
             </button>

@@ -86,26 +86,26 @@ const ComingSoon = () => {
 
           {/* Countdown Timer */}
           <div className="flex justify-center space-x-4 mb-12">
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg w-24">
-              <div className="text-3xl font-bold">
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg md:w-24 w-20">
+              <div className="md:text-3xl text-2xl font-bold">
                 {String(timeLeft.days).padStart(2, "0")}
               </div>
               <div className="text-sm text-blue-200">Days</div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg w-24">
-              <div className="text-3xl font-bold">
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg md:w-24 w-20">
+              <div className="md:text-3xl text-2xl font-bold">
                 {String(timeLeft.hours).padStart(2, "0")}
               </div>
               <div className="text-sm text-blue-200">Hours</div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg w-24">
-              <div className="text-3xl font-bold">
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg md:w-24 w-20">
+              <div className="md:text-3xl text-2xl font-bold">
                 {String(timeLeft.minutes).padStart(2, "0")}
               </div>
               <div className="text-sm text-blue-200">Minutes</div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg w-24">
-              <div className="text-3xl font-bold">
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg md:w-24 w-20">
+              <div className="md:text-3xl text-2xl font-bold">
                 {String(timeLeft.seconds).padStart(2, "0")}
               </div>
               <div className="text-sm text-blue-200">Seconds</div>

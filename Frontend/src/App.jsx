@@ -44,7 +44,7 @@ const isAuthenticated = () => {
 
 const isAdmin = () => {
   // You might want to add role checking here
-  return sessionStorage.getItem("userRole") === "admin";
+  return localStorage.getItem("userRole") === "admin" || localStorage.getItem("userRole") === "superadmin" || sessionStorage.getItem("userRole") === "admin" || sessionStorage.getItem("userRole") === "superadmin";
 };
 
 // Route protection components
